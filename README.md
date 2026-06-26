@@ -1,32 +1,69 @@
 ```mermaid
 erDiagram
-    %% Subtype/Supertype specialisation (Disjoint Constraints)
-    %% Note: Modeled as 1-to-(0..1) to visually distinguish the hierarchy
+    %% 1. SPECIALISATION HIERARCHY (Forces PERSONS to the absolute top)
     PERSONS ||--o| LEARNERS : "is-a (d)"
     PERSONS ||--o| TEACHERS : "is-a (d)"
     PERSONS ||--o| ITADMINS : "is-a (d)"
 
-    %% Standard Relationships
-    PROGRAMS ||--o{ QUALIFICATIONS : "has"
+    %% 2. PARENTS OF PERSONS (Reversed syntax keeps PERSONS anchored high)
+    PERSONS }o--|| SCHOOLS : "associated with"
+    PERSONS }o--|| ADDRESSES : "located at"
+
+    %% 3. SUBTYPE CHILD RELATIONSHIPS (Flowing downward)
+    LEARNERS ||--o{ DOCUMENTS : "uploads"
+    LEARNERS ||--o{ LEARNERMARKS : "achieves"
+    LEARNERS ||--o{ APPLICATIONS : "submits"
+    
+    ITADMINS }o--|| UNIVERSITIES : "employed by"
+    ITADMINS }o--|| SCHOOLS : "manages IT for"
+
+    %% 4. GEOGRAPHY & INSTITUTIONS
+    ADDRESSES }o--|| CITIES : "situated in"
+    UNIVERSITIES }o--|| CITIES : "located in"
+    
+    %% 5. INSTITUTION CHILDREN
+    SCHOOLS ||--o{ SUBJECTS : "teaches"
+    UNIVERSITIES ||--o{ PROSPECTUSES : "publishes"
+    UNIVERSITIES ||--o{ APPLICATIONS : "receives"
+    
+    %% 6. ACADEMIC FRAMEWORK
+    PROGRAMS ||--o{ QUALIFICATIONS : "includes"
     QUALIFICATIONS ||--o{ UNI_QUALIFICATIONS : "offered as"
     UNIVERSITIES ||--o{ UNI_QUALIFICATIONS : "offers"
-    CITIES ||--o{ UNIVERSITIES : "has"
-    CITIES ||--o{ ADDRESSES : "has"
-    ADDRESSES ||--o{ PERSONS : "locates"
-    SCHOOLS ||--o{ PERSONS : "associates"
-    UNIVERSITIES ||--o{ PROSPECTUSES : "publishes"
-    SCHOOLS ||--o{ SUBJECTS : "teaches"
-    UNIVERSITIES ||--o{ ITADMINS : "employs"
-    SCHOOLS ||--o{ ITADMINS : "employs"
-    SUBJECTS ||--o{ LEARNERMARKS : "assesses"
-    LEARNERS ||--o{ LEARNERMARKS : "achieves"
-    LEARNERS ||--o{ DOCUMENTS : "uploads"
-    LEARNERS ||--o{ APPLICATIONS : "submits"
-    UNIVERSITIES ||--o{ APPLICATIONS : "receives"
+    
+    %% 7. BOTTOM LEVEL RESOLUTIONS
+    SUBJECTS ||--o{ LEARNERMARKS : "assessed in"
     APPLICATIONS ||--o{ APPLICATION_PROCESSES : "undergoes"
-    ACTIONS ||--o{ APPLICATION_PROCESSES : "defines"
+    APPLICATION_PROCESSES }o--|| ACTIONS : "actioned by"
 
-    %% Table Definitions
+    %% --- TABLE DEFINITIONS ---
+
+    PERSONS {
+        NUMBER PERSONS_ID PK
+        VARCHAR2 FIRSTNAME
+        VARCHAR2 LAST_NAME
+        VARCHAR2 EMAIL
+        VARCHAR2 USERNAME
+        VARCHAR2 PHONE_NO
+        VARCHAR2 SA_ID_NO
+        NUMBER SCHOOL_ID FK
+        NUMBER ADDRESS_ID FK
+    }
+    LEARNERS {
+        NUMBER LEARNER_ID PK
+        NUMBER PERSONS_ID FK
+    }
+    TEACHERS {
+        NUMBER TEACHER_ID PK
+        NUMBER PERSONS_ID FK
+        VARCHAR2 DEPARTMENT
+    }
+    ITADMINS {
+        NUMBER ITADMIN_ID PK
+        NUMBER PERSON_ID FK
+        NUMBER SCHOOL_ID FK
+        NUMBER UNIVERSITY_ID FK
+    }
     CITIES {
         NUMBER CITYID PK
         VARCHAR2 CITYNAME
@@ -57,26 +94,6 @@ erDiagram
         NUMBER ACTION_ID PK
         VARCHAR2 ACTION_NAME
     }
-    PERSONS {
-        NUMBER PERSONS_ID PK
-        VARCHAR2 FIRSTNAME
-        VARCHAR2 LAST_NAME
-        VARCHAR2 EMAIL
-        VARCHAR2 USERNAME
-        VARCHAR2 PHONE_NO
-        VARCHAR2 SA_ID_NO
-        NUMBER SCHOOL_ID FK
-        NUMBER ADDRESS_ID FK
-    }
-    LEARNERS {
-        NUMBER LEARNER_ID PK
-        NUMBER PERSONS_ID FK
-    }
-    TEACHERS {
-        NUMBER TEACHER_ID PK
-        NUMBER PERSONS_ID FK
-        VARCHAR2 DEPARTMENT
-    }
     UNIVERSITIES {
         NUMBER UNIVERSITY_ID PK
         VARCHAR2 UNIVERSITY_NAME
@@ -86,12 +103,6 @@ erDiagram
         VARCHAR2 PROSPECTUS_MIMETYPE
         DATE PROSPECTUS_DATE
         NUMBER CITYID FK
-    }
-    ITADMINS {
-        NUMBER ITADMIN_ID PK
-        NUMBER PERSON_ID FK
-        NUMBER SCHOOL_ID FK
-        NUMBER UNIVERSITY_ID FK
     }
     PROSPECTUSES {
         NUMBER PROSPECTUS_ID PK
@@ -146,5 +157,3 @@ erDiagram
         NUMBER ACTION_ID FK
         VARCHAR2 ACTION_DATE
     }
-
-```
